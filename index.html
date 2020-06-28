@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT TEST</title>
+</head>
+<body>
+    <div id="app"></div> 
+    <div>
+        <textarea id="msg" cols="60" rows="5">{"msgType": 1, "content": "test3333333333333333333333"}</textarea>
+    </div>
+    
+    <button id="submit">发布</button>   
+    <script src="bundle.js"></script>
+    <script>
+        var clientWeb = {}
+
+        var mqttSdk = window.mqttSdk({
+            appId: 'addavsdsda',
+            apiHost: 'https://test.domain.com',
+            headerOptions: {
+                client: 'WEB_M'
+            }
+        })
+
+        mqttSdk.connectImRoom('avwAWdvb', {
+            onConnect: (client, intoRoom) => {
+                console.log('intoRoomDataStr: ', intoRoom),
+                clientWeb = client
+            },
+            onMessage: (topic, payload) => {
+                console.log('message:', payload)
+                var data = JSON.parse(payload)
+                var p = document.createElement('p');
+                p.innerHTML = `<p>${payload}</p>`
+                document.getElementById('app').appendChild(p)                
+            },
+            onError: (err) => {
+                console.log(err)
+                let message = '加入聊天室失败，请刷新页面重试'
+                if (err && err.message && err.message.includes('"code":-20181001')) {
+                    message = JSON.parse(err.message).message
+                }
+            }
+        })
+
+        document.getElementById('submit').addEventListener('click', function() {
+            clientWeb.sendMessage({
+                msgType: 1,
+                content: document.getElementById('msg').value,
+            }).then(res => console.log(res));
+        })
+    </script>
+</body>
+</html>
